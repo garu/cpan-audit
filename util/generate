@@ -214,7 +214,7 @@ sub process_files ( $files ) {
         message( "Processing $file...\n" );
         my $yaml = YAML::Tiny->read($file)->[0];
         my $dist = $yaml->[0]{distribution} or next;
-        $db{dists}->{$dist}->{advisories} = $yaml;
+        push $db{dists}{$dist}{advisories}->@*, @$yaml;
     }
 
     provides( \%db );
