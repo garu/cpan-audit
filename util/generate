@@ -213,8 +213,21 @@ sub process_files ( $files ) {
     foreach my $file ( $files->@* ) {
         message( "Processing $file...\n" );
         my $yaml = YAML::Tiny->read($file)->[0];
-        my $dist = $yaml->[0]{distribution} or next;
-        push $db{dists}{$dist}{advisories}->@*, @$yaml;
+        my ($dist, $advisories);
+        if (ref $yaml eq "ARRAY") {
+            $dist = $yaml->[0]{distribution};
+            $advisories = $yaml;
+        }
+        elsif (ref $yaml eq "HASH") {
+            $dist =  $yaml->{distribution};
+            $advisories = $yaml->{advisories};
+        }
+        else {
+            warn "Entry is neither ARAAY nor HASH";
+            next;
+        }
+        $dist or next;
+        push $db{dists}{$dist}{advisories}->@* => @$advisories;
     }
 
     provides( \%db );
